@@ -108,14 +108,31 @@
   let audioCtx = null, musicGain = null;
   const MUSIC_VOL = 0.17;
   function initAudio() {
-    if (audioCtx) { if (audioCtx.state === 'suspended') audioCtx.resume(); return; }
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    audioCtx = new AC();
-    musicGain = audioCtx.createGain();
-    musicGain.gain.value = musicOn ? MUSIC_VOL : 0;
-    musicGain.connect(audioCtx.destination);
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+      audioCtx = new AC();
+      musicGain = audioCtx.createGain();
+      musicGain.gain.value = musicOn ? MUSIC_VOL : 0;
+      musicGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    try {
+      const s = audioCtx.createBufferSource();
+      s.buffer = audioCtx.createBuffer(1, 1, 22050);
+      s.connect(audioCtx.destination); s.start(0);
+    } catch (e) {}
   }
+  function unlockAudio() {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'running') {
+      window.removeEventListener('touchend', unlockAudio);
+      window.removeEventListener('pointerdown', unlockAudio);
+    }
+  }
+  window.addEventListener('touchend', unlockAudio);
+  window.addEventListener('pointerdown', unlockAudio);
   function tone(freq, dur, type, dest, vol, when) {
     if (!audioCtx) return;
     const t0 = audioCtx.currentTime + (when || 0);
