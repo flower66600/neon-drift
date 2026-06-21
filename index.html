@@ -93,8 +93,7 @@
       equip: 'НАДЕТЬ', equipped: 'НАДЕТО', owned: 'КУПЛЕНО',
     },
   };
-  let lang = localStorage.getItem('neondrift_lang')
-    || ((navigator.language || 'en').toLowerCase().startsWith('ru') ? 'ru' : 'en');
+  let lang = localStorage.getItem('neondrift_lang') || 'ru';
   const t = k => (I18N[lang] || I18N.en)[k];
 
   const isTouch = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
