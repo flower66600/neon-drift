@@ -270,6 +270,7 @@
   });
   pauseBtn.addEventListener('click', e => { e.stopPropagation(); setPaused(true); });
   $('resumeBtn').addEventListener('click', () => setPaused(false));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) setPaused(true); });
 
   const shopEl = $('shop'), menuBar = $('menuBar');
   let coins  = +localStorage.getItem('neondrift_coins') || 0;
